@@ -5,7 +5,11 @@
 #
 
 # Pull base image.
-FROM dockerfile/java:oracle-java8
+FROM java:8
+
+RUN groupadd -r app -g 1000 && useradd -u 1000 -r -g app -m -d /data -s /sbin/nologin -c "App user" app
+
+
 
 ENV ES_PKG_NAME elasticsearch-1.5.0
 
@@ -17,10 +21,13 @@ RUN \
   rm -f $ES_PKG_NAME.tar.gz && \
   mv /$ES_PKG_NAME /elasticsearch
 
+# specify the user ot execute commands
+USER 1000
+
 # Define mountable directories.
 VOLUME ["/data"]
 
-RUN groupadd -r app -g 1000 && useradd -u 1000 -r -g app -m -d /data -s /sbin/nologin -c "App user' app && chmod 755 /data
+RUN chmod 755 /data
 
 # Mount elasticsearch.yml config
 ADD config/elasticsearch.yml /elasticsearch/config/elasticsearch.yml
@@ -28,8 +35,6 @@ ADD config/elasticsearch.yml /elasticsearch/config/elasticsearch.yml
 # Define working directory.
 WORKDIR /data
 
-# specify the user ot execute commands
-USER app
 
 # Define default command.
 CMD ["/elasticsearch/bin/elasticsearch"]
