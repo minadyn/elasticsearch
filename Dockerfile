@@ -20,11 +20,16 @@ RUN \
 # Define mountable directories.
 VOLUME ["/data"]
 
+RUN groupadd -r app -g 1000 && useradd -u 1000 -r -g app -m -d /data -s /sbin/nologin -c "App user' app && chmod 755 /data
+
 # Mount elasticsearch.yml config
 ADD config/elasticsearch.yml /elasticsearch/config/elasticsearch.yml
 
 # Define working directory.
 WORKDIR /data
+
+# specify the user ot execute commands
+USER app
 
 # Define default command.
 CMD ["/elasticsearch/bin/elasticsearch"]
